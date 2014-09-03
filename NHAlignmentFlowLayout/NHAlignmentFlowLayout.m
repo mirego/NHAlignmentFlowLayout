@@ -15,7 +15,9 @@
     for (UICollectionViewLayoutAttributes* attributes in array) {
         if (nil == attributes.representedElementKind) {
             NSIndexPath* indexPath = attributes.indexPath;
-            attributes.frame = [self layoutAttributesForItemAtIndexPath:indexPath].frame;
+            if ([self.collectionView numberOfItemsInSection:indexPath.section] > 0) {
+                attributes.frame = [self layoutAttributesForItemAtIndexPath:indexPath].frame;
+            }
         }
     }
     return array;
