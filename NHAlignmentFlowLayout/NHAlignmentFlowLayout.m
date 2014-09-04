@@ -10,6 +10,24 @@
 
 @implementation NHAlignmentFlowLayout
 
+-(CGFloat)minimumInteritemSpacingForSectionAtIndex:(NSInteger)index
+{
+    if([self.collectionView.delegate respondsToSelector:@selector(collectionView:layout:minimumInteritemSpacingForSectionAtIndex:)]){
+        id<UICollectionViewDelegateFlowLayout> flowLayoutDelegate = (id<UICollectionViewDelegateFlowLayout>) self.collectionView.delegate;
+        return [flowLayoutDelegate collectionView:self.collectionView layout:self minimumInteritemSpacingForSectionAtIndex:index];
+    }
+    return self.minimumInteritemSpacing;
+}
+
+-(UIEdgeInsets)insetForSectionAtIndex:(NSInteger)index
+{
+    if([self.collectionView.delegate respondsToSelector:@selector(collectionView:layout:insetForSectionAtIndex:)]){
+        id<UICollectionViewDelegateFlowLayout> flowLayoutDelegate = (id<UICollectionViewDelegateFlowLayout>) self.collectionView.delegate;
+        return [flowLayoutDelegate collectionView:self.collectionView layout:self insetForSectionAtIndex:index];
+    }
+    return self.sectionInset;
+}
+
 - (NSArray *)layoutAttributesForElementsInRect:(CGRect)rect {
     NSArray* array = [super layoutAttributesForElementsInRect:rect];
     for (UICollectionViewLayoutAttributes* attributes in array) {
@@ -59,25 +77,25 @@
 	UICollectionViewLayoutAttributes *attributes = [super layoutAttributesForItemAtIndexPath:indexPath];
 	CGRect frame = attributes.frame;
 	
-	if (attributes.frame.origin.x <= self.sectionInset.left) {
+	if (attributes.frame.origin.x <= [self insetForSectionAtIndex:indexPath.section].left) {
 		return attributes;
 	}
 	
 	if (indexPath.item == 0) {
-		frame.origin.x = self.sectionInset.left;
+		frame.origin.x = [self insetForSectionAtIndex:indexPath.section].left;
 	} else {
 		NSIndexPath *previousIndexPath = [NSIndexPath indexPathForItem:indexPath.item - 1 inSection:indexPath.section];
 		UICollectionViewLayoutAttributes *previousAttributes = [self layoutAttributesForItemAtIndexPath:previousIndexPath];
 		
 		if (attributes.frame.origin.y > previousAttributes.frame.origin.y) {
-			frame.origin.x = self.sectionInset.left;
+			frame.origin.x = [self insetForSectionAtIndex:indexPath.section].left;
 		} else {
-			frame.origin.x = CGRectGetMaxX(previousAttributes.frame) + self.minimumInteritemSpacing;
+			frame.origin.x = CGRectGetMaxX(previousAttributes.frame) + [self minimumInteritemSpacingForSectionAtIndex:indexPath.section];
 		}
 	}
 	
 	attributes.frame = frame;
-
+    
 	return attributes;
 }
 
@@ -86,20 +104,20 @@
 	UICollectionViewLayoutAttributes *attributes = [super layoutAttributesForItemAtIndexPath:indexPath];
 	CGRect frame = attributes.frame;
 	
-	if (attributes.frame.origin.y <= self.sectionInset.top) {
+	if (attributes.frame.origin.y <= [self insetForSectionAtIndex:indexPath.section].top) {
 		return attributes;
 	}
 	
 	if (indexPath.item == 0) {
-		frame.origin.y = self.sectionInset.top;
+		frame.origin.y = [self insetForSectionAtIndex:indexPath.section].top;
 	} else {
 		NSIndexPath *previousIndexPath = [NSIndexPath indexPathForItem:indexPath.item - 1 inSection:indexPath.section];
 		UICollectionViewLayoutAttributes *previousAttributes = [self layoutAttributesForItemAtIndexPath:previousIndexPath];
 		
 		if (attributes.frame.origin.x > previousAttributes.frame.origin.x) {
-			frame.origin.y = self.sectionInset.top;
+			frame.origin.y = [self insetForSectionAtIndex:indexPath.section].top;
 		} else {
-			frame.origin.y = CGRectGetMaxY(previousAttributes.frame) + self.minimumInteritemSpacing;
+			frame.origin.y = CGRectGetMaxY(previousAttributes.frame) + [self minimumInteritemSpacingForSectionAtIndex:indexPath.section];
 		}
 	}
 	
@@ -114,26 +132,26 @@
 	UICollectionViewLayoutAttributes *attributes = [super layoutAttributesForItemAtIndexPath:indexPath];
 	CGRect frame = attributes.frame;
 	
-	if (CGRectGetMaxX(attributes.frame) >= self.collectionViewContentSize.width - self.sectionInset.right) {
+	if (CGRectGetMaxX(attributes.frame) >= self.collectionViewContentSize.width - [self insetForSectionAtIndex:indexPath.section].right) {
 		return attributes;
 	}
 	
 	if (indexPath.item == [self.collectionView numberOfItemsInSection:indexPath.section] - 1) {
-		frame.origin.x = self.collectionViewContentSize.width - self.sectionInset.right - frame.size.width;
+		frame.origin.x = self.collectionViewContentSize.width - [self insetForSectionAtIndex:indexPath.section].right - frame.size.width;
 	} else {
 		
 		NSIndexPath *nextIndexPath = [NSIndexPath indexPathForItem:indexPath.item + 1 inSection:indexPath.section];
 		UICollectionViewLayoutAttributes *nextAttributes = [self layoutAttributesForItemAtIndexPath:nextIndexPath];
 		
 		if (attributes.frame.origin.y < nextAttributes.frame.origin.y) {
-			frame.origin.x = self.collectionViewContentSize.width - self.sectionInset.right - frame.size.width;
+			frame.origin.x = self.collectionViewContentSize.width - [self insetForSectionAtIndex:indexPath.section].right - frame.size.width;
 		} else {
-			frame.origin.x = nextAttributes.frame.origin.x - self.minimumInteritemSpacing - attributes.frame.size.width;
+			frame.origin.x = nextAttributes.frame.origin.x - [self minimumInteritemSpacingForSectionAtIndex:indexPath.section] - attributes.frame.size.width;
 		}
 	}
-
+    
 	attributes.frame = frame;
-
+    
 	return attributes;
 }
 
@@ -142,26 +160,26 @@
 	UICollectionViewLayoutAttributes *attributes = [super layoutAttributesForItemAtIndexPath:indexPath];
 	CGRect frame = attributes.frame;
 	
-	if (CGRectGetMaxY(attributes.frame) >= self.collectionViewContentSize.height - self.sectionInset.left) {
+	if (CGRectGetMaxY(attributes.frame) >= self.collectionViewContentSize.height - [self insetForSectionAtIndex:indexPath.section].left) {
 		return attributes;
 	}
 	
-	if (indexPath.item == [self.collectionView numberOfItemsInSection:indexPath.section]) {
-		frame.origin.y = self.collectionViewContentSize.height - self.sectionInset.bottom - frame.size.height;
+	if (indexPath.item == [self.collectionView numberOfItemsInSection:indexPath.section] - 1) {
+		frame.origin.y = self.collectionViewContentSize.height - [self insetForSectionAtIndex:indexPath.section].bottom - frame.size.height;
 	} else {
 		NSIndexPath *nextIndexPath = [NSIndexPath indexPathForItem:indexPath.item + 1 inSection:indexPath.section];
 		UICollectionViewLayoutAttributes *nextAttributes = [self layoutAttributesForItemAtIndexPath:nextIndexPath];
 		
 		if (attributes.frame.origin.x < nextAttributes.frame.origin.x) {
-			frame.origin.y = self.collectionViewContentSize.height - self.sectionInset.bottom - frame.size.height;
+			frame.origin.y = self.collectionViewContentSize.height - [self insetForSectionAtIndex:indexPath.section].bottom - frame.size.height;
 		} else {
 			
-			frame.origin.y = nextAttributes.frame.origin.y - self.minimumInteritemSpacing - attributes.frame.size.height;
+			frame.origin.y = nextAttributes.frame.origin.y - [self minimumInteritemSpacingForSectionAtIndex:indexPath.section] - attributes.frame.size.height;
 		}
 	}
 	
 	attributes.frame = frame;
-
+    
 	return attributes;
 }
 
