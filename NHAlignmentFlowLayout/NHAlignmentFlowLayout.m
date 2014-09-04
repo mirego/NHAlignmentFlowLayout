@@ -21,6 +21,17 @@
     return array;
 }
 
+-(UIEdgeInsets)nh_insetForSectionAtIndex:(NSInteger)section
+{
+    UIEdgeInsets insetForSection = self.sectionInset;
+    id delegate = self.collectionView.delegate;
+    if ([delegate respondsToSelector:@selector(collectionView:layout:insetForSectionAtIndex:)]) {
+        insetForSection = [(id)delegate collectionView:self.collectionView layout:self insetForSectionAtIndex:section];
+    }
+    
+    return insetForSection;
+}
+
 -(UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath
 {
 	UICollectionViewLayoutAttributes *attributes;
@@ -57,18 +68,19 @@
 	UICollectionViewLayoutAttributes *attributes = [super layoutAttributesForItemAtIndexPath:indexPath];
 	CGRect frame = attributes.frame;
 	
-	if (attributes.frame.origin.x <= self.sectionInset.left) {
+    UIEdgeInsets sectionInset = [self nh_insetForSectionAtIndex:indexPath.section];
+	if (attributes.frame.origin.x <= sectionInset.left) {
 		return attributes;
 	}
 	
 	if (indexPath.item == 0) {
-		frame.origin.x = self.sectionInset.left;
+		frame.origin.x = sectionInset.left;
 	} else {
 		NSIndexPath *previousIndexPath = [NSIndexPath indexPathForItem:indexPath.item - 1 inSection:indexPath.section];
 		UICollectionViewLayoutAttributes *previousAttributes = [self layoutAttributesForItemAtIndexPath:previousIndexPath];
 		
 		if (attributes.frame.origin.y > previousAttributes.frame.origin.y) {
-			frame.origin.x = self.sectionInset.left;
+			frame.origin.x = sectionInset.left;
 		} else {
 			frame.origin.x = CGRectGetMaxX(previousAttributes.frame) + self.minimumInteritemSpacing;
 		}
@@ -84,18 +96,19 @@
 	UICollectionViewLayoutAttributes *attributes = [super layoutAttributesForItemAtIndexPath:indexPath];
 	CGRect frame = attributes.frame;
 	
-	if (attributes.frame.origin.y <= self.sectionInset.top) {
+    UIEdgeInsets sectionInset = [self nh_insetForSectionAtIndex:indexPath.section];
+	if (attributes.frame.origin.y <= sectionInset.top) {
 		return attributes;
 	}
 	
 	if (indexPath.item == 0) {
-		frame.origin.y = self.sectionInset.top;
+		frame.origin.y = sectionInset.top;
 	} else {
 		NSIndexPath *previousIndexPath = [NSIndexPath indexPathForItem:indexPath.item - 1 inSection:indexPath.section];
 		UICollectionViewLayoutAttributes *previousAttributes = [self layoutAttributesForItemAtIndexPath:previousIndexPath];
 		
 		if (attributes.frame.origin.x > previousAttributes.frame.origin.x) {
-			frame.origin.y = self.sectionInset.top;
+			frame.origin.y = sectionInset.top;
 		} else {
 			frame.origin.y = CGRectGetMaxY(previousAttributes.frame) + self.minimumInteritemSpacing;
 		}
@@ -112,19 +125,20 @@
 	UICollectionViewLayoutAttributes *attributes = [super layoutAttributesForItemAtIndexPath:indexPath];
 	CGRect frame = attributes.frame;
 	
-	if (CGRectGetMaxX(attributes.frame) >= self.collectionViewContentSize.width - self.sectionInset.right) {
+    UIEdgeInsets sectionInset = [self nh_insetForSectionAtIndex:indexPath.section];
+	if (CGRectGetMaxX(attributes.frame) >= self.collectionViewContentSize.width - sectionInset.right) {
 		return attributes;
 	}
 	
 	if (indexPath.item == [self.collectionView numberOfItemsInSection:indexPath.section] - 1) {
-		frame.origin.x = self.collectionViewContentSize.width - self.sectionInset.right - frame.size.width;
+		frame.origin.x = self.collectionViewContentSize.width - sectionInset.right - frame.size.width;
 	} else {
 		
 		NSIndexPath *nextIndexPath = [NSIndexPath indexPathForItem:indexPath.item + 1 inSection:indexPath.section];
 		UICollectionViewLayoutAttributes *nextAttributes = [self layoutAttributesForItemAtIndexPath:nextIndexPath];
 		
 		if (attributes.frame.origin.y < nextAttributes.frame.origin.y) {
-			frame.origin.x = self.collectionViewContentSize.width - self.sectionInset.right - frame.size.width;
+			frame.origin.x = self.collectionViewContentSize.width - sectionInset.right - frame.size.width;
 		} else {
 			frame.origin.x = nextAttributes.frame.origin.x - self.minimumInteritemSpacing - attributes.frame.size.width;
 		}
@@ -140,18 +154,19 @@
 	UICollectionViewLayoutAttributes *attributes = [super layoutAttributesForItemAtIndexPath:indexPath];
 	CGRect frame = attributes.frame;
 	
-	if (CGRectGetMaxY(attributes.frame) >= self.collectionViewContentSize.height - self.sectionInset.left) {
+    UIEdgeInsets sectionInset = [self nh_insetForSectionAtIndex:indexPath.section];
+	if (CGRectGetMaxY(attributes.frame) >= self.collectionViewContentSize.height - sectionInset.left) {
 		return attributes;
 	}
 	
 	if (indexPath.item == [self.collectionView numberOfItemsInSection:indexPath.section]) {
-		frame.origin.y = self.collectionViewContentSize.height - self.sectionInset.bottom - frame.size.height;
+		frame.origin.y = self.collectionViewContentSize.height - sectionInset.bottom - frame.size.height;
 	} else {
 		NSIndexPath *nextIndexPath = [NSIndexPath indexPathForItem:indexPath.item + 1 inSection:indexPath.section];
 		UICollectionViewLayoutAttributes *nextAttributes = [self layoutAttributesForItemAtIndexPath:nextIndexPath];
 		
 		if (attributes.frame.origin.x < nextAttributes.frame.origin.x) {
-			frame.origin.y = self.collectionViewContentSize.height - self.sectionInset.bottom - frame.size.height;
+			frame.origin.y = self.collectionViewContentSize.height - sectionInset.bottom - frame.size.height;
 		} else {
 			
 			frame.origin.y = nextAttributes.frame.origin.y - self.minimumInteritemSpacing - attributes.frame.size.height;
