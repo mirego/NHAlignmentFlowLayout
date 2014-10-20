@@ -55,7 +55,7 @@
 {
 	UICollectionViewLayoutAttributes *attributes;
 	
-	switch (self.alignment) {
+	switch ([self alignmentForSectionAtIndex:indexPath.section]) {
 		case NHAlignmentTopLeftAligned:
 		{
 			if (self.scrollDirection == UICollectionViewScrollDirectionVertical) {
