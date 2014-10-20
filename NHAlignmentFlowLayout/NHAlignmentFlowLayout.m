@@ -12,23 +12,31 @@
 
 -(CGFloat)minimumInteritemSpacingForSectionAtIndex:(NSInteger)index
 {
-    if([self.collectionView.delegate respondsToSelector:@selector(collectionView:layout:minimumInteritemSpacingForSectionAtIndex:)]){
-        id<UICollectionViewDelegateFlowLayout> flowLayoutDelegate = (id<UICollectionViewDelegateFlowLayout>) self.collectionView.delegate;
-        return [flowLayoutDelegate collectionView:self.collectionView layout:self minimumInteritemSpacingForSectionAtIndex:index];
+    if ([self.collectionView.delegate respondsToSelector:@selector(collectionView:layout:minimumInteritemSpacingForSectionAtIndex:)]){
+        return [(id)self.collectionView.delegate collectionView:self.collectionView layout:self minimumInteritemSpacingForSectionAtIndex:index];
     }
     return self.minimumInteritemSpacing;
 }
 
 -(UIEdgeInsets)insetForSectionAtIndex:(NSInteger)index
 {
-    if([self.collectionView.delegate respondsToSelector:@selector(collectionView:layout:insetForSectionAtIndex:)]){
-        id<UICollectionViewDelegateFlowLayout> flowLayoutDelegate = (id<UICollectionViewDelegateFlowLayout>) self.collectionView.delegate;
-        return [flowLayoutDelegate collectionView:self.collectionView layout:self insetForSectionAtIndex:index];
+    if ([self.collectionView.delegate respondsToSelector:@selector(collectionView:layout:insetForSectionAtIndex:)]){
+        return [(id)self.collectionView.delegate collectionView:self.collectionView layout:self insetForSectionAtIndex:index];
     }
     return self.sectionInset;
 }
 
-- (NSArray *)layoutAttributesForElementsInRect:(CGRect)rect {
+-(NHAlignment)alignmentForSectionAtIndex:(NSInteger)section
+{
+    if ([self.collectionView.delegate respondsToSelector:@selector(collectionView:layout:alignmentForSectionAtIndex:)]) {
+        return [(id)self.collectionView.delegate collectionView:self.collectionView layout:self alignmentForSectionAtIndex:section];
+    }
+    
+    return self.alignment;
+}
+
+-(NSArray *)layoutAttributesForElementsInRect:(CGRect)rect
+{
     NSArray* array = [super layoutAttributesForElementsInRect:rect];
     for (UICollectionViewLayoutAttributes* attributes in array) {
         if (nil == attributes.representedElementKind) {
@@ -41,20 +49,10 @@
     return array;
 }
 
--(NHAlignment)alignmentForSectionAtIndex:(NSInteger)section
-{
-    if ([self.collectionView.delegate respondsToSelector:@selector(collectionView:layout:alignmentForSectionAtIndex:)]) {
-        id<NHAlignmentDelegateFlowLayout> flowLayoutDelegate = (id<NHAlignmentDelegateFlowLayout>) self.collectionView.delegate;
-        return [flowLayoutDelegate collectionView:self.collectionView layout:self alignmentForSectionAtIndex:section];
-    }
-    
-    return self.alignment;
-}
-
 -(UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-	UICollectionViewLayoutAttributes *attributes;
-	
+    UICollectionViewLayoutAttributes *attributes;
+    
 	switch ([self alignmentForSectionAtIndex:indexPath.section]) {
 		case NHAlignmentTopLeftAligned:
 		{
@@ -78,8 +76,8 @@
 			attributes = [super layoutAttributesForItemAtIndexPath:indexPath];
 			break;
 	}
-	
-	return attributes;
+    
+    return attributes;
 }
 
 -(UICollectionViewLayoutAttributes *)layoutAttributesForLeftAlignmentForItemAtIndexPath:(NSIndexPath *)indexPath
