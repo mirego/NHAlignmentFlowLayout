@@ -41,6 +41,16 @@
     return array;
 }
 
+-(NHAlignment)alignmentForSectionAtIndex:(NSInteger)section
+{
+    if ([self.collectionView.delegate respondsToSelector:@selector(collectionView:layout:alignmentForSectionAtIndex:)]) {
+        id<NHAlignmentDelegateFlowLayout> flowLayoutDelegate = (id<NHAlignmentDelegateFlowLayout>) self.collectionView.delegate;
+        return [flowLayoutDelegate collectionView:self.collectionView layout:self alignmentForSectionAtIndex:section];
+    }
+    
+    return self.alignment;
+}
+
 -(UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath
 {
 	UICollectionViewLayoutAttributes *attributes;

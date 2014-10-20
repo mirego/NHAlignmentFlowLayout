@@ -19,3 +19,9 @@ typedef NS_ENUM(NSInteger, NHAlignment) {
 @property (nonatomic) NHAlignment alignment;
 
 @end
+
+@protocol NHAlignmentDelegateFlowLayout <UICollectionViewDelegateFlowLayout>
+
+@optional
+- (NHAlignment)collectionView:(UICollectionView *)collectionView layout:(NHAlignmentFlowLayout *)collectionViewLayout alignmentForSectionAtIndex:(NSInteger)section;
+@end
