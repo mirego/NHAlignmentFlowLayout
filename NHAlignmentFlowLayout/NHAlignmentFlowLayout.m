@@ -35,9 +35,18 @@
     return self.alignment;
 }
 
++(NSArray *)arrayDeepCopy:(NSArray *)array {
+    NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:[array count]];
+    for (UICollectionViewLayoutAttributes *attributes in array) {
+        [mutableArray addObject:[attributes copy]];
+    }
+    return [mutableArray copy];
+}
+
 -(NSArray *)layoutAttributesForElementsInRect:(CGRect)rect
 {
-    NSArray* array = [super layoutAttributesForElementsInRect:rect];
+    NSArray* array = [NHAlignmentFlowLayout arrayDeepCopy:[super layoutAttributesForElementsInRect:rect]];
+    
     for (UICollectionViewLayoutAttributes* attributes in array) {
         if (nil == attributes.representedElementKind) {
             NSIndexPath* indexPath = attributes.indexPath;
@@ -82,7 +91,7 @@
 
 -(UICollectionViewLayoutAttributes *)layoutAttributesForLeftAlignmentForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-	UICollectionViewLayoutAttributes *attributes = [super layoutAttributesForItemAtIndexPath:indexPath];
+	UICollectionViewLayoutAttributes *attributes = [[super layoutAttributesForItemAtIndexPath:indexPath] copy];
 	CGRect frame = attributes.frame;
 	
 	if (attributes.frame.origin.x <= [self insetForSectionAtIndex:indexPath.section].left) {
@@ -109,7 +118,7 @@
 
 -(UICollectionViewLayoutAttributes *)layoutAttributesForTopAlignmentForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-	UICollectionViewLayoutAttributes *attributes = [super layoutAttributesForItemAtIndexPath:indexPath];
+	UICollectionViewLayoutAttributes *attributes = [[super layoutAttributesForItemAtIndexPath:indexPath] copy];
 	CGRect frame = attributes.frame;
 	
 	if (attributes.frame.origin.y <= [self insetForSectionAtIndex:indexPath.section].top) {
@@ -137,7 +146,7 @@
 
 -(UICollectionViewLayoutAttributes *)layoutAttributesForRightAlignmentForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-	UICollectionViewLayoutAttributes *attributes = [super layoutAttributesForItemAtIndexPath:indexPath];
+	UICollectionViewLayoutAttributes *attributes = [[super layoutAttributesForItemAtIndexPath:indexPath] copy];
 	CGRect frame = attributes.frame;
 	
 	if (CGRectGetMaxX(attributes.frame) >= self.collectionViewContentSize.width - [self insetForSectionAtIndex:indexPath.section].right) {
@@ -165,7 +174,7 @@
 
 -(UICollectionViewLayoutAttributes *)layoutAttributesForBottomAlignmentForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-	UICollectionViewLayoutAttributes *attributes = [super layoutAttributesForItemAtIndexPath:indexPath];
+	UICollectionViewLayoutAttributes *attributes = [[super layoutAttributesForItemAtIndexPath:indexPath] copy];
 	CGRect frame = attributes.frame;
 	
 	if (CGRectGetMaxY(attributes.frame) >= self.collectionViewContentSize.height - [self insetForSectionAtIndex:indexPath.section].left) {
